@@ -1,0 +1,181 @@
+---
+title: "808W Assignment 2 Submission File"
+author: "Pranav P. Jaipurkar (115798120)"
+date: "10/25/2018"
+output: html_document
+---
+Comment: Question 1
+
+Reading the Datasets
+
+```{r}
+house_train <- read.csv("~/Desktop/Data Science 808W/Datasets/house_train.csv")
+View(house_train)
+house_test <- read.csv("~/Desktop/Data Science 808W/Datasets/house_test.csv")
+View(house_test)
+```
+Comment: Question 2
+
+Checking the missing values
+
+```{r}
+sum(is.na(house_test))
+sum(is.na(house_train))
+```
+Comment: Checking the levels
+
+```{r}
+levels(house_train$state)
+```
+Comment: Making linear models
+
+```{r}
+fit.lm1 <- lm(formula = price2013 ~ state, data = house_train)
+View(fit.lm1$coefficients)
+```
+Comment: Summarizing and finding max and min values in the model
+
+```{r}
+max(fit.lm1$coefficients)
+min(fit.lm1$coefficients)
+fit.lm_sm1 <- summary(fit.lm1)
+(fit.lm_sm1)
+```
+Comment: Sorting the model to find the max and min values
+
+```{r}
+fit.lm1_decre1 <- sort(fit.lm1$coefficients, decreasing = T)
+fit.lm1_decre1
+fit.lm1_incre1 <- sort(fit.lm1$coefficients, decreasing = F)
+fit.lm1_incre1
+```
+Comment: Using the formula y = mx + c to predict the average price of housing
+
+```{r}
+DC_avg <- fit.lm1$coefficients[1] + fit.lm1_decre1[1]
+DC_avg
+WV_avg <- fit.lm1$coefficients[1] + fit.lm1_incre1[1]
+WV_avg
+```
+Comment: Finding the mean values of housing in Dc and WV state from training dataset
+
+```{r}
+DC <- (house_train$price2007[house_train$state == "DC"])
+View(DC)
+mean(DC)
+mean(house_train$price2007[house_train$state == "DC"])
+WV <- (house_train$price2007[house_train$state == "WV"])
+View(WV)
+mean(WV)
+mean(house_train$price2007[house_train$state == "WV"])
+```
+Comment: Question 3
+
+Making linear model with state and county information
+
+```{r}
+fit.lm2 <- lm(formula = price2013 ~ state + county, data = house_train)
+```
+Comment: Exploring the model
+
+```{r}
+fit.lm2$coefficients
+attributes(fit.lm2)
+max(fit.lm2$coefficients, na.rm = T)
+min(fit.lm2$coefficients, na.rm = T)
+fit.lm_sm2 <- summary(fit.lm2)
+fit.lm_sm2
+```
+Comment: Sorting the model
+
+```{r}
+fit.lm1_decre2 <- sort(fit.lm2$coefficients, decreasing = T)
+View(fit.lm1_decre2)
+fit.lm1_incre2 <- sort(fit.lm2$coefficients, decreasing = F)
+View(fit.lm1_incre2)
+```
+Comment: Question 4
+
+Making different models
+
+```{r}
+fit.lm3 <- lm(formula = price2013 ~ price2007 + state + county + poverty, data = house_train)
+fit.lm_sm3 <- summary(fit.lm3)
+
+fit.lm4 <- lm(formula = price2013 ~ county + poverty, data = house_train)
+fit.lm_sm4 <- summary(fit.lm4)
+
+fit.lm5 <- lm(formula = price2013 ~ price2007 + poverty, data = house_train)
+fit.lm_sm5 <- summary(fit.lm5)
+
+fit.lm6 <- lm(formula = price2013 ~ price2007 + poverty + county, data = house_train)
+fit.lm_sm6 <- summary(fit.lm6)
+
+fit.lm7 <- lm(formula = price2013 ~ price2007 + county, data = house_train)
+fit.lm_sm7 <- summary(fit.lm7)
+
+
+fit.lm8 <- lm(formula = price2013 ~ zip + price2007 + state + county + poverty, data = house_train)
+fit.lm_sm8 <- summary(fit.lm8)
+```
+Comment: Making the levels of county same in trained Linear Regression model and test data
+
+```{r}
+fit.lm1$xlevels[["county"]] <- union(fit.lm1$xlevels[["county"]], levels(house_test$county))
+fit.lm2$xlevels[["county"]] <- union(fit.lm2$xlevels[["county"]], levels(house_test$county))
+fit.lm3$xlevels[["county"]] <- union(fit.lm3$xlevels[["county"]], levels(house_test$county))
+fit.lm4$xlevels[["county"]] <- union(fit.lm4$xlevels[["county"]], levels(house_test$county))
+fit.lm5$xlevels[["county"]] <- union(fit.lm5$xlevels[["county"]], levels(house_test$county))
+fit.lm6$xlevels[["county"]] <- union(fit.lm6$xlevels[["county"]], levels(house_test$county))
+fit.lm7$xlevels[["county"]] <- union(fit.lm7$xlevels[["county"]], levels(house_test$county))
+fit.lm8$xlevels[["county"]] <- union(fit.lm8$xlevels[["county"]], levels(house_test$county))
+```
+Comment: Predicting the housing price for 2007 using linear models
+
+```{r}
+p1 <- predict(fit.lm1, house_test)
+p2 <- predict(fit.lm2, house_test)
+p3 <- predict(fit.lm3, house_test)
+p4 <- predict(fit.lm4, house_test)
+p5 <- predict(fit.lm5, house_test)
+p6 <- predict(fit.lm6, house_test)
+p7 <- predict(fit.lm7, house_test)
+p8 <- predict(fit.lm8, house_test)
+```
+Comment: Writing predictions into a csv file
+
+```{r}
+pr1 <- cbind(house_test$id, p1)
+colnames(pr1) <- c("id", "prediction")
+View(pr1)
+write.csv(pr1, "Prediction Model 1.csv")
+pr2 <- cbind(house_test$id, p2)
+colnames(pr2) <- c("id", "prediction")
+View(pr2)
+write.csv(pr2, "Prediction Model 2.csv")
+pr3 <- cbind(house_test$id, p3)
+colnames(pr3) <- c("id", "prediction")
+View(pr3)
+write.csv(pr3, "Prediction Model 3.csv")
+pr4 <- cbind(house_test$id, p4)
+colnames(pr4) <- c("id", "prediction")
+View(pr4)
+write.csv(pr4, "Prediction Model 4.csv")
+pr5 <- cbind(house_test$id, p5)
+colnames(pr5) <- c("id", "prediction")
+View(pr5)
+write.csv(pr5, "Prediction Model 5.csv")
+pr6 <- cbind(house_test$id, p6)
+colnames(pr6) <- c("id", "prediction")
+View(pr6)
+write.csv(pr6, "Prediction Model 6.csv")
+pr7 <- cbind(house_test$id, p7)
+colnames(pr7) <- c("id", "prediction")
+View(pr7)
+write.csv(pr7, "Prediction Model 7.csv")
+pr8 <- cbind(house_test$id, p8)
+colnames(pr8) <- c("id", "prediction")
+View(pr8)
+write.csv(pr8, "Prediction Model 8.csv")
+```
+
